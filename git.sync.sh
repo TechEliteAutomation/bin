@@ -14,7 +14,8 @@ for dir in "$BASE_DIR"/*; do
     git config user.email "$GIT_EMAIL"
     git config user.name "$GIT_NAME"
     
-    git add .
+    # Stage all changes (including untracked files)
+    git add -A
     
     # Commit changes with timestamp
     git commit -m "Auto-sync: $(date "+%Y-%m-%d %H:%M:%S")" 2>/dev/null || true
