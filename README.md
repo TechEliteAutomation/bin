@@ -1,2 +1,0 @@
-# bin
-# production-ready scripts

@@ -18,7 +18,8 @@ rm rmlint.json
 echo "Complete."
 
 echo "Renaming all files..."
-/home/u/c/utils/batch/batch_file_renamer.sh
+# Renames files according to parameters in file renamer script
+/home/u/s/bin/file.renamer.sh
 echo "Complete."
 
 # Remove EXIF data
