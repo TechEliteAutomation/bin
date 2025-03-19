@@ -16,5 +16,11 @@ for dir in "$BASE_DIR"/*; do
     
     git add .
     git commit -m "Auto-sync: $(date "+%Y-%m-%d %H:%M:%S")" 2>/dev/null || true
-    git push origin $(git rev-parse --abbrev-ref HEAD)
+    
+    # Push only if there are changes
+    if git diff --quiet; then
+        echo "No changes to commit in $dir."
+    else
+        git push origin $(git rev-parse --abbrev-ref HEAD)
+    fi
 done
