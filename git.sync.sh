@@ -15,12 +15,15 @@ for dir in "$BASE_DIR"/*; do
     git config user.name "$GIT_NAME"
     
     git add .
-    git commit -m "Auto-sync: $(date "+%Y-%m-%d %H:%M:%S")" 2>/dev/null || true
     
+    # Commit changes with timestamp
+    git commit -m "Auto-sync: $(date "+%Y-%m-%d %H:%M:%S")" 2>/dev/null || true
+
     # Push only if there are changes
-    if git diff --quiet; then
-        echo "No changes to commit in $dir."
-    else
+    if git status --porcelain | grep -q .; then
+        echo "Changes detected in $dir. Pushing changes."
         git push origin $(git rev-parse --abbrev-ref HEAD)
+    else
+        echo "No changes to commit in $dir."
     fi
 done
