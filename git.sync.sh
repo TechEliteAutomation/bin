@@ -3,15 +3,13 @@
 BASE_DIR="/home/u/s"
 GIT_EMAIL="at253341@gmail.com"
 GIT_NAME="TechEliteAutomation"
-LOG_FILE="/var/log/git-sync.log"
+LOG_FILE="$HOME/git-sync.log"
 
 # Log function
 log() {
     echo "[$(date "+%Y-%m-%d %H:%M:%S")] $1" | tee -a "$LOG_FILE"
 }
 
-# Ensure log directory exists
-mkdir -p "$(dirname "$LOG_FILE")"
 log "Starting git sync process"
 
 # Ensure GitHub's SSH key is trusted
