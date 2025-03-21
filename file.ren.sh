@@ -18,6 +18,7 @@ get_extension() {
         "application/x-rar-compressed") echo ".rar" ;;
         "application/zip") echo ".zip" ;;
         "audio/mpeg") echo ".mp3" ;;
+        "image/bmp") echo ".bmp" ;;
         "image/gif") echo ".gif" ;;
         "image/jpeg") echo ".jpg" ;;
         "image/png") echo ".png" ;;

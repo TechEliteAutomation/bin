@@ -7,8 +7,8 @@ unzip -B '*.zip'
 rm *.zip
 echo "Complete."
 
-echo "Deleting all files less than 100k..."
-find . -maxdepth 1 -type f -size -100k -delete
+echo "Deleting all files less than 50k..."
+find . -maxdepth 1 -type f -size -50k -delete
 echo "Complete."
 
 echo "Removing duplicates(1)..."
@@ -19,7 +19,7 @@ echo "Complete."
 
 echo "Renaming all files..."
 # Renames files according to parameters in file renamer script
-/home/u/s/bin/file.renamer.sh
+/home/u/s/bin/file.ren.sh
 echo "Complete."
 
 # Remove EXIF data

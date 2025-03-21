@@ -29,7 +29,6 @@ cleanup() {
     # Directories to clean
     local -a directories=(
         "/tmp"
-        "/var/tmp"
         "/var/cache"
         "/home/u/.cache/"
         "/home/u/.local/share/Trash"
