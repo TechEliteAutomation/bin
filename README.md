@@ -1,4 +1,4 @@
-# README
+# TechEliteAutomation - `bin` Repository
 
 This repository contains several Bash and Python scripts designed for system maintenance, file processing, and AI-based responses. Below is a breakdown of each script and its functionality.
 
