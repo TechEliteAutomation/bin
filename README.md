@@ -16,7 +16,7 @@ This repository contains several deployment-ready Bash and Python scripts design
 - Removes small files.
 - Identifies and deletes duplicate files using `rmlint`.
 - Renames files using a custom script (`file.renamer.sh`).
-- Removes EXIF metadata from images.
+- Removes EXIF metadata.
 - Converts file types.
 
 ### 3. `file.renamer.sh`
