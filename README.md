@@ -30,7 +30,7 @@ This repository contains several Bash and Python scripts designed for system mai
 - Converts responses to speech using `espeak-ng`.
 
 ### 5. `gem.gtts.py`
-- Similar to `gemini_chatbot.py`, but uses `gTTS` for text-to-speech.
+- Similar to `gem.espk.py`, but uses `gTTS` for text-to-speech.
 - Saves and plays back generated audio.
 - Enforces strict logical response formatting.
 
@@ -59,7 +59,7 @@ This repository contains several Bash and Python scripts designed for system mai
 Each script can be executed independently using:
 ```bash
 bash script_name.sh  # For Bash scripts
-python3 script_name.py  # For Python scripts
+python script_name.py  # For Python scripts
 ```
 Ensure necessary dependencies are installed before execution.
 
