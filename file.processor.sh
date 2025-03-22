@@ -67,9 +67,5 @@ rmlint
 ./rmlint.sh -d
 rm rmlint.json
 echo "Complete."
-
-# echo "Removing all files less than 1MiB..." 
-# find . -maxdepth 1 -type f -size -2M -delete
-# echo "Complete."
  
 echo "File processing complete."

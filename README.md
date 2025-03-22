@@ -11,7 +11,7 @@ This repository contains several Bash and Python scripts designed for system mai
 - Uses `rsync` to transfer files efficiently.
 - Logs the backup operation.
 
-### 2. `file.processor.sh` (numeric filename suffix designates variants)
+### 2. `file.processor.sh`
 - Unzips and deletes `.zip` archives.
 - Removes small files (<50kB).
 - Identifies and deletes duplicate files using `rmlint`.
