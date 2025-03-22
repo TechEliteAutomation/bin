@@ -13,12 +13,11 @@ This repository contains several deployment-ready Bash and Python scripts design
 
 ### 2. `file.processor.sh`
 - Unzips and deletes `.zip` archives.
-- Removes small files (<50kB).
+- Removes small files.
 - Identifies and deletes duplicate files using `rmlint`.
-- Renames files using a custom script (`file.ren.sh`).
+- Renames files using a custom script (`file.renamer.sh`).
 - Removes EXIF metadata from images.
-- Converts `.webp` images to `.png` or `.gif`.
-- Converts `.jpg` images (<1MB) to `.png`.
+- Converts file types.
 
 ### 3. `file.renamer.sh`
 - Renames all files in the current directory with a 10-digit random numeric name.
@@ -30,7 +29,7 @@ This repository contains several deployment-ready Bash and Python scripts design
 - Converts responses to speech using `espeak-ng`.
 
 ### 5. `gemini.gtts.py`
-- Similar to `gem.espk.py`, but uses `gTTS` for text-to-speech.
+- Similar to `gemini.espeak.py`, but uses `gTTS` for text-to-speech.
 - Saves and plays back generated audio.
 - Enforces strict logical response formatting.
 
