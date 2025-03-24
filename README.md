@@ -1,4 +1,4 @@
-# [TechEliteAutomation.com](https://techeliteautomation.com) - `bin` Repository
+# [TechEliteAutomation](https://techeliteautomation.com) - `bin` Repository
 
 This repository contains several deployment-ready Bash and Python scripts designed for system maintenance, file processing, and AI-based responses. Below is a breakdown of each script and its functionality.
 
@@ -45,7 +45,7 @@ This repository contains several deployment-ready Bash and Python scripts design
 - Deletes files from `/tmp`, `/var/cache`, and the user's trash directory.
 
 ### 8. `sys.report.sh`
-- Generates system information reports in Markdown and text formats.
+- Generates system information reports in markdown and text formats.
 - Logs OS, kernel, CPU, memory, disk, GPU, and network details.
 - Outputs system package list and running services.
 
@@ -54,8 +54,16 @@ This repository contains several deployment-ready Bash and Python scripts design
 - Updates AUR packages via `yay`.
 - Provides verbose output for troubleshooting.
 
+### 10. `yt.wl.js`
+- Tampermonkey script to clear all videos from a YouTube 'Watch Later' playlist.
+- Adds a floating control panel for easy activation.
+- Iterates through videos, removing them automatically.
+- Implements adaptive DOM selectors for reliability.
+- Displays real-time status updates during execution.
+- Uses safe DOM interactions without external dependencies.
+
 ## Usage
-Each script can be executed independently using:
+Each script (with the exception of yt.wl.js) can be executed independently using:
 ```bash
 bash script_name.sh  # For Bash scripts
 python script_name.py  # For Python scripts
