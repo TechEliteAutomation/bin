@@ -55,12 +55,10 @@ This repository contains several deployment-ready Bash and Python scripts design
 - Provides verbose output for troubleshooting.
 
 ### 10. `yt.wl.js`
-- Clears all videos from a YouTube 'Watch Later' playlist (integrated with Tampermonkey).
+- Iterates through YouTube 'Watdch Later' videos, removing them automatically.
 - Adds a floating control panel for easy activation.
-- Iterates through videos, removing them automatically.
 - Implements adaptive DOM selectors for reliability.
 - Displays real-time status updates during execution.
-- Uses safe DOM interactions without external dependencies.
 
 ## Usage
 Each script (with the exception of yt.wl.js) can be executed independently using:
