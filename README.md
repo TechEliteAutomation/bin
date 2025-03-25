@@ -4,6 +4,8 @@ This repository contains several deployment-ready Bash and Python scripts design
 
 ## Scripts Overview
 
+## Scripts Overview
+
 ### 1. `file.backup.sh`
 - Detects and mounts a USB drive.
 - Prompts the user to delete existing files.
@@ -39,22 +41,28 @@ This repository contains several deployment-ready Bash and Python scripts design
 - Detects changes, commits with a timestamp, and pushes updates.
 - Logs all operations.
 
-### 7. `sys.clean.sh`
+### 7. `screen.record.sh`
+- Captures full screen video and audio using FFmpeg.
+- Records screen at 30 FPS with high-quality video and audio settings.
+- Saves output to a pre-defined MP4 file.
+- Utilizes x11grab for screen capture and pulse audio for sound recording.
+
+### 8. `sys.clean.sh`
 - Clears temporary and cache directories.
 - Calculates and logs freed disk space.
 - Deletes files from `/tmp`, `/var/cache`, and the user's trash directory.
 
-### 8. `sys.report.sh`
+### 9. `sys.report.sh`
 - Generates system information reports in markdown and text formats.
 - Logs OS, kernel, CPU, memory, disk, GPU, and network details.
 - Outputs system package list and running services.
 
-### 9. `sys.update.sh`
+### 10. `sys.update.sh`
 - Updates system packages via `pacman`.
 - Updates AUR packages via `yay`.
 - Provides verbose output for troubleshooting.
 
-### 10. `yt.wl.js`
+### 11. `yt.wl.js`
 - Iterates through YouTube 'Watdch Later' videos, removing them automatically.
 - Adds a floating control panel for easy activation.
 - Implements adaptive DOM selectors for reliability.
