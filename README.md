@@ -4,8 +4,6 @@ This repository contains several deployment-ready Bash and Python scripts design
 
 ## Scripts Overview
 
-## Scripts Overview
-
 ### 1. `file.backup.sh`
 - Detects and mounts a USB drive.
 - Prompts the user to delete existing files.
@@ -63,7 +61,7 @@ This repository contains several deployment-ready Bash and Python scripts design
 - Provides verbose output for troubleshooting.
 
 ### 11. `yt.wl.js`
-- Iterates through YouTube 'Watdch Later' videos, removing them automatically.
+- Iterates through YouTube 'Watch Later' videos, removing them automatically.
 - Adds a floating control panel for easy activation.
 - Implements adaptive DOM selectors for reliability.
 - Displays real-time status updates during execution.
