@@ -1,3 +1,9 @@
 gemini.pdg.py
 file.processor0.sh
 file.processor1.sh
+gemini.espeak0.py
+gemini.espeak1.py
+sim.py
+sim0.py
+sim1.py
+sim2.py

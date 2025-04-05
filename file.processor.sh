@@ -7,9 +7,9 @@ unzip -B '*.zip'
 rm *.zip
 echo "Complete."
 
-echo "Deleting all files less than 25k..."
-find . -maxdepth 1 -type f -size -25k -delete
-echo "Complete."
+# echo "Deleting all files less than 25k..."
+# find . -maxdepth 1 -type f -size -25k -delete
+# echo "Complete."
 
 echo "Removing duplicates(1)..."
 rmlint

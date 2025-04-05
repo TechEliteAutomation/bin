@@ -22,7 +22,9 @@ get_extension() {
         "image/gif") echo ".gif" ;;
         "image/jpeg") echo ".jpg" ;;
         "image/png") echo ".png" ;;
+        "image/svg+xml") echo ".svg" ;;
         "image/webp") echo ".webp" ;;
+        "text/html") echo ".html" ;;
         "text/plain") echo ".txt" ;;
         "video/3gpp") echo ".3gp" ;;
         "video/mp4") echo ".mp4" ;;
