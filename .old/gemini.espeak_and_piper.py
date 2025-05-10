@@ -10,7 +10,7 @@ import shlex   # Import shlex to safely quote text for shell commands
 import sys
 
 # --- Configuration (Could be moved to a config file later) ---
-DEFAULT_TTS_ENGINE = "espeak" # or "piper"
+DEFAULT_TTS_ENGINE = "piper" # or "espeak"
 PIPER_EXECUTABLE = "/usr/bin/piper-tts"
 PIPER_VOICE_MODEL = "/home/u/s/tts/en_GB-alan-medium.onnx"
 

@@ -14,6 +14,7 @@ done
 get_extension() {
     local mime_type=$1
     case $mime_type in
+		"application/msword") echo ".doc" ;;
         "application/pdf") echo ".pdf" ;;
         "application/x-rar-compressed") echo ".rar" ;;
         "application/zip") echo ".zip" ;;
@@ -24,6 +25,8 @@ get_extension() {
         "image/png") echo ".png" ;;
         "image/svg+xml") echo ".svg" ;;
         "image/webp") echo ".webp" ;;
+		"image/vnd.microsoft.icon") echo ".ico" ;;
+        "message/rfc822") echo ".eml" ;;
         "text/html") echo ".html" ;;
         "text/plain") echo ".txt" ;;
         "video/3gpp") echo ".3gp" ;;
@@ -31,7 +34,7 @@ get_extension() {
         "video/webm") echo ".webm" ;;
         "video/x-m4v") echo ".m4v" ;;
         "video/x-msvideo") echo ".avi" ;;
-        *) echo "" ;; # Return empty if no match found
+        *) echo "" ;; # Return empty if no match found       
     esac
 }
 

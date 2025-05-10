@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interactive Physics Simulation</title>
+<style>
+    body { margin: 0; overflow: hidden; background-color: #f0f0f0; }
+    canvas { display: block; }
+</style>
+</head>
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script>
+    // Ensure Matter.js is loaded
+    if (typeof Matter === 'undefined') {
+        document.body.innerHTML = '<p>Error: Could not load Matter.js library. Please check your internet connection or the CDN link.</p>';
+    } else {
+        // Module aliases
+        var Engine = Matter.Engine,
+            Render = Matter.Render,
+            Runner = Matter.Runner,
+            Bodies = Matter.Bodies,
+            Composite = Matter.Composite,
+            Mouse = Matter.Mouse,
+            MouseConstraint = Matter.MouseConstraint;
+
+        // Create an engine
+        var engine = Engine.create();
+        var world = engine.world;
+
+        // Get viewport dimensions
+        var viewportWidth = window.innerWidth;
+        var viewportHeight = window.innerHeight;
+
+        // Create a renderer
+        var render = Render.create({
+            element: document.body,
+            engine: engine,
+            options: {
+                width: viewportWidth,
+                height: viewportHeight,
+                wireframes: false, // Set to true for wireframe view
+                background: '#1b1b1d'
+            }
+        });
+
+        // Create ground
+        var ground = Bodies.rectangle(viewportWidth / 2, viewportHeight - 30, viewportWidth, 60, { isStatic: true });
+
+        // Create some bodies
+        var stack = [];
+        var boxSize = 40;
+        for (var i = 0; i < 10; i++) {
+            for (var j = 0; j < 5; j++) {
+                var x = viewportWidth / 2 - 100 + j * (boxSize + 5);
+                var y = viewportHeight - 100 - i * (boxSize + 5);
+                var body;
+                if (Math.random() > 0.5) {
+                    body = Bodies.rectangle(x, y, boxSize, boxSize, {
+                         render: { fillStyle: `hsl(${Math.random() * 360}, 70%, 60%)` }
+                    });
+                } else {
+                    body = Bodies.circle(x, y, boxSize / 2, {
+                        render: { fillStyle: `hsl(${Math.random() * 360}, 70%, 60%)` }
+                    });
+                }
+                stack.push(body);
+            }
+        }
+
+        // Add all bodies to the world
+        Composite.add(world, [
+            ground,
+            ...stack // Add all bodies from the stack
+        ]);
+
+        // Add mouse control
+        var mouse = Mouse.create(render.canvas);
+        var mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: {
+                    visible: false // Make the constraint line invisible
+                }
+            }
+        });
+
+        Composite.add(world, mouseConstraint);
+
+        // Keep the mouse in sync with rendering
+        render.mouse = mouse;
+
+        // Create runner
+        var runner = Runner.create();
+
+        // Run the engine
+        Runner.run(runner, engine);
+
+        // Run the renderer
+        Render.run(render);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            viewportWidth = window.innerWidth;
+            viewportHeight = window.innerHeight;
+
+            // Update renderer size
+            render.canvas.width = viewportWidth;
+            render.canvas.height = viewportHeight;
+            render.options.width = viewportWidth;
+            render.options.height = viewportHeight;
+
+            // Update ground position and size (optional, depends on desired behavior)
+            Matter.Body.setPosition(ground, { x: viewportWidth / 2, y: viewportHeight - 30 });
+            // Note: Resizing static bodies like ground dynamically can be complex.
+            // This example only updates position. A full resize might require recreating it.
+
+            // You might need to reposition other elements or adjust camera view if needed
+        });
+    }
+</script>
+
+</body>
+</html>

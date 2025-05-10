@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Super Fun Interactive Physics Simulation!</title>
+<style>
+    body { margin: 0; overflow: hidden; background-color: #101012; font-family: 'Arial', sans-serif; }
+    canvas { display: block; }
+    #controls {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        background: rgba(40, 40, 50, 0.8);
+        padding: 10px 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+    #controls button {
+        background-color: #4a4a88;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.2s, transform 0.1s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    #controls button:hover {
+        background-color: #5a5aa8;
+    }
+    #controls button:active {
+        background-color: #6a6ac8;
+        transform: scale(0.95);
+    }
+    #controls button.party-active {
+        background-color: #ff47ab;
+        animation: pulsePartyButton 1s infinite;
+    }
+    @keyframes pulsePartyButton {
+        0% { box-shadow: 0 0 5px #ff47ab; }
+        50% { box-shadow: 0 0 15px #ff47ab, 0 0 25px #ff47ab; }
+        100% { box-shadow: 0 0 5px #ff47ab; }
+    }
+    #errorMessage {
+        color: #ff6b6b;
+        text-align: center;
+        padding: 20px;
+        font-size: 18px;
+    }
+</style>
+</head>
+<body>
+
+<div id="controls">
+    <button id="addBoxBtn">Add Box</button>
+    <button id="addCircleBtn">Add Circle</button>
+    <button id="addPolygonBtn">Add Polygon</button>
+    <button id="gravityBtn">Gravity: Normal</button>
+    <button id="explodeBtn">💥 EXPLODE! 💥</button>
+    <button id="resetBtn">Reset Sim</button>
+    <button id="partyModeBtn">🎉 Party Mode 🎉</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script>
+    if (typeof Matter === 'undefined') {
+        document.body.innerHTML = '<p id="errorMessage">Error: Could not load Matter.js library. Please check your internet connection or the CDN link.</p>';
+    } else {
+        // Module aliases
+        const Engine = Matter.Engine,
+            Render = Matter.Render,
+            Runner = Matter.Runner,
+            Bodies = Matter.Bodies,
+            Composite = Matter.Composite,
+            Mouse = Matter.Mouse,
+            MouseConstraint = Matter.MouseConstraint,
+            Events = Matter.Events;
+
+        // --- Audio Context and Sound Functions ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let soundsEnabled = audioCtx !== undefined; // Basic check
+
+        function playSound(type, ...args) {
+            if (!soundsEnabled || !audioCtx || audioCtx.state === 'suspended') return; // Don't play if suspended (e.g. before user interaction)
+            
+            // Attempt to resume AudioContext if suspended (common browser policy)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => {
+                    playSoundInternal(type, ...args);
+                }).catch(e => console.warn("AudioContext resume failed:", e));
+                return; 
+            }
+            playSoundInternal(type, ...args);
+        }
+        
+        function playSoundInternal(type, ...args) {
+            switch(type) {
+                case 'pop': playPopSound(); break;
+                case 'hit': playHitSound(args[0]); break;
+                case 'explode': playExplodeSound(); break;
+                case 'party': playPartyHornSound(); break;
+            }
+        }
+
+
+        function playPopSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(660, audioCtx.currentTime); // E5
+            oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.05); // A5
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        }
+
+        let lastHitSoundTime = 0;
+        const hitSoundCooldown = 50; // ms
+
+        function playHitSound(intensity = 0.3) {
+            const now = Date.now();
+            if (now - lastHitSoundTime < hitSoundCooldown) return;
+            lastHitSoundTime = now;
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'sine';
+            const baseFreq = 80 + Math.random() * 80;
+            oscillator.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, audioCtx.currentTime + 0.1);
+            const gain = Math.min(0.3, Math.max(0.01, intensity * 0.05));
+            gainNode.gain.setValueAtTime(gain, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function playExplodeSound() {
+            const bufferSize = audioCtx.sampleRate * 0.8; // 0.8 second
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1; // White noise
+            }
+            const whiteNoise = audioCtx.createBufferSource();
+            whiteNoise.buffer = noiseBuffer;
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.7);
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = "lowpass";
+            filter.frequency.setValueAtTime(3000, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.6);
+            whiteNoise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            whiteNoise.start(audioCtx.currentTime);
+            whiteNoise.stop(audioCtx.currentTime + 0.8);
+        }
+        
+        function playPartyHornSound() {
+            const G4 = 392.00;
+            const C5 = 523.25;
+            const D5 = 587.33;
+        
+            const playNote = (freq, startTime, duration, volume = 0.2) => {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+        
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime + startTime);
+                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime + startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + startTime + duration);
+        
+                oscillator.start(audioCtx.currentTime + startTime);
+                oscillator.stop(audioCtx.currentTime + startTime + duration);
+            };
+        
+            playNote(G4, 0, 0.15);
+            playNote(C5, 0.15, 0.15);
+            playNote(D5, 0.3, 0.25);
+        }
+
+
+        // --- Simulation Setup ---
+        let engine = Engine.create();
+        let world = engine.world;
+
+        let viewportWidth = window.innerWidth;
+        let viewportHeight = window.innerHeight;
+
+        let render = Render.create({
+            element: document.body,
+            engine: engine,
+            options: {
+                width: viewportWidth,
+                height: viewportHeight,
+                wireframes: false,
+                background: '#1b1b1d'
+            }
+        });
+
+        let ground;
+        function createGround() {
+            ground = Bodies.rectangle(viewportWidth / 2, viewportHeight - 30, viewportWidth, 60, {
+                isStatic: true,
+                render: { fillStyle: '#333338' }
+            });
+            Composite.add(world, ground);
+        }
+        createGround();
+
+        const boxSize = 40;
+        let initialStack = [];
+
+        function createRandomBody(x, y, isPartyObject = false) {
+            const randomChoice = Math.random();
+            let body;
+            const restitution = isPartyObject ? Math.random() * 0.5 + 0.5 : Math.random() * 0.2 + 0.1; // Bouncier party objects
+            const options = {
+                restitution: restitution,
+                friction: 0.05 + Math.random() * 0.1,
+                render: { fillStyle: `hsl(${Math.random() * 360}, 100%, 70%)` }
+            };
+
+            if (randomChoice < 0.4) {
+                body = Bodies.rectangle(x, y, boxSize * (0.8 + Math.random()*0.4), boxSize * (0.8 + Math.random()*0.4), options);
+            } else if (randomChoice < 0.8) {
+                body = Bodies.circle(x, y, boxSize / 2 * (0.8 + Math.random()*0.4), options);
+            } else {
+                const sides = Math.floor(Math.random() * 5) + 3; // 3 to 7 sides
+                body = Bodies.polygon(x, y, sides, boxSize / 2 * (0.9 + Math.random()*0.3), options);
+            }
+            if (isPartyObject) {
+                Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.5);
+            }
+            return body;
+        }
+
+        function populateInitialStack() {
+            initialStack = [];
+            const cols = Math.max(1, Math.floor(viewportWidth / (boxSize * 2.5)));
+            const startX = viewportWidth / 2 - (cols / 2) * (boxSize + 10) + (boxSize + 10)/2;
+
+            for (let i = 0; i < 8; i++) { // Rows
+                for (let j = 0; j < cols; j++) {
+                    let x = startX + j * (boxSize + 10);
+                    let y = viewportHeight - 100 - i * (boxSize + 10);
+                    initialStack.push(createRandomBody(x, y));
+                }
+            }
+            Composite.add(world, initialStack);
+        }
+        populateInitialStack();
+
+        // Add mouse control
+        const mouse = Mouse.create(render.canvas);
+        const mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.1, // Softer grab
+                render: { visible: false }
+            }
+        });
+        Composite.add(world, mouseConstraint);
+        render.mouse = mouse;
+
+        // Runner
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+        Render.run(render);
+
+        // --- Event Handlers & UI Logic ---
+        Events.on(engine, 'collisionStart', function(event) {
+            if (audioCtx && audioCtx.state === 'suspended') return; // Wait for user interaction
+            let maxDepth = 0;
+            event.pairs.forEach(pair => {
+                if (pair.collision.depth > maxDepth) {
+                    maxDepth = pair.collision.depth;
+                }
+            });
+            if (maxDepth > 0.5) { // Only play for somewhat significant collisions
+                playSound('hit', maxDepth);
+            }
+        });
+        
+        // Resume AudioContext on first user interaction with canvas (or buttons)
+        function resumeAudio() {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(e => console.warn("AudioContext resume failed:", e));
+            }
+            // Remove this listener after first interaction
+            document.body.removeEventListener('mousedown', resumeAudio);
+            document.body.removeEventListener('touchstart', resumeAudio);
+        }
+        document.body.addEventListener('mousedown', resumeAudio);
+        document.body.addEventListener('touchstart', resumeAudio);
+
+
+        document.getElementById('addBoxBtn').addEventListener('click', () => {
+            const x = viewportWidth / 2 + (Math.random() - 0.5) * 200;
+            const y = 50 + Math.random() * 50;
+            Composite.add(world, Bodies.rectangle(x, y, boxSize, boxSize, {
+                restitution: 0.3,
+                render: { fillStyle: `hsl(${Math.random() * 360}, 100%, 70%)` }
+            }));
+            playSound('pop');
+        });
+
+        document.getElementById('addCircleBtn').addEventListener('click', () => {
+            const x = viewportWidth / 2 + (Math.random() - 0.5) * 200;
+            const y = 50 + Math.random() * 50;
+            Composite.add(world, Bodies.circle(x, y, boxSize / 2, {
+                restitution: 0.4,
+                render: { fillStyle: `hsl(${Math.random() * 360}, 100%, 70%)` }
+            }));
+            playSound('pop');
+        });
+
+        document.getElementById('addPolygonBtn').addEventListener('click', () => {
+            const x = viewportWidth / 2 + (Math.random() - 0.5) * 200;
+            const y = 50 + Math.random() * 50;
+            const sides = Math.floor(Math.random() * 5) + 3; // 3 to 7 sides
+            Composite.add(world, Bodies.polygon(x, y, sides, boxSize / 1.8, {
+                restitution: 0.35,
+                render: { fillStyle: `hsl(${Math.random() * 360}, 100%, 70%)` }
+            }));
+            playSound('pop');
+        });
+
+        function resetSimulation() {
+            Composite.clear(world, false); // false to keep static bodies
+            Composite.add(world, ground); // Re-add ground if it was cleared by a bug or different clear
+            populateInitialStack();
+            Composite.add(world, mouseConstraint); // Re-add mouse constraint
+             if (isPartyMode) togglePartyMode(); // Turn off party mode if on
+        }
+        document.getElementById('resetBtn').addEventListener('click', resetSimulation);
+
+        const gravityLevels = [
+            { y: 1, label: "Normal" },
+            { y: 0.5, label: "Low" },
+            { y: 0, label: "Zero-G!" },
+            { y: -0.5, label: "Anti-Grav!" },
+            { y: 2, label: "Heavy!" }
+        ];
+        let currentGravityIndex = 0;
+        const gravityBtn = document.getElementById('gravityBtn');
+        document.getElementById('gravityBtn').addEventListener('click', () => {
+            currentGravityIndex = (currentGravityIndex + 1) % gravityLevels.length;
+            engine.world.gravity.y = gravityLevels[currentGravityIndex].y;
+            gravityBtn.textContent = `Gravity: ${gravityLevels[currentGravityIndex].label}`;
+            playSound('pop');
+        });
+
+        document.getElementById('explodeBtn').addEventListener('click', () => {
+            const bodies = Composite.allBodies(world);
+            bodies.forEach(body => {
+                if (!body.isStatic) {
+                    const forceMagnitude = 0.06 + Math.random() * 0.04; // More oomph!
+                    const angle = Math.random() * Math.PI * 2;
+                    Matter.Body.applyForce(body, body.position, {
+                        x: Math.cos(angle) * forceMagnitude * body.mass, // Scale by mass for more consistent visual effect
+                        y: Math.sin(angle) * forceMagnitude * body.mass - (0.01 * body.mass) // slight upward bias
+                    });
+                }
+            });
+            playSound('explode');
+        });
+
+        let isPartyMode = false;
+        let partyInterval;
+        const partyModeBtn = document.getElementById('partyModeBtn');
+        const originalBgColor = render.options.background;
+        let partyBgColorIndex = 0;
+        const partyColors = ['#ff00ff', '#00ffff', '#ffff00', '#ff69b4', '#7fff00', '#ffa500'];
+
+        function togglePartyMode() {
+            isPartyMode = !isPartyMode;
+            partyModeBtn.classList.toggle('party-active', isPartyMode);
+
+            if (isPartyMode) {
+                playSound('party');
+                engine.world.gravity.y = 0.3; // Lighter gravity for party
+                gravityBtn.textContent = `Gravity: Party!`;
+                partyInterval = setInterval(() => {
+                    // Spawn object
+                    const x = Math.random() * viewportWidth;
+                    const y = -50; // Spawn from top
+                    Composite.add(world, createRandomBody(x, y, true));
+
+                    // Flash background
+                    partyBgColorIndex = (partyBgColorIndex + 1) % partyColors.length;
+                    render.options.background = partyColors[partyBgColorIndex];
+                }, 200); // Spawn rate and bg flash
+            } else {
+                clearInterval(partyInterval);
+                render.options.background = originalBgColor;
+                // Reset to default gravity or current selection if it was changed
+                engine.world.gravity.y = gravityLevels[currentGravityIndex].y;
+                gravityBtn.textContent = `Gravity: ${gravityLevels[currentGravityIndex].label}`;
+            }
+        }
+        partyModeBtn.addEventListener('click', togglePartyMode);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            viewportWidth = window.innerWidth;
+            viewportHeight = window.innerHeight;
+
+            render.canvas.width = viewportWidth;
+            render.canvas.height = viewportHeight;
+            render.options.width = viewportWidth;
+            render.options.height = viewportHeight;
+
+            // Recreate ground to fit new width
+            Composite.remove(world, ground);
+            createGround();
+
+            // Optional: reposition camera/view if you've changed it (not done in this example)
+            // Matter.Render.lookAt(render, Composite.allBodies(world), { x: 50, y: 50 });
+        });
+    }
+</script>
+
+</body>
+</html>
