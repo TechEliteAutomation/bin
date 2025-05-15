@@ -3,7 +3,7 @@
 BASE_DIR="/home/u/s"
 GIT_EMAIL="at253341@gmail.com"
 GIT_NAME="TechEliteAutomation"
-LOG_FILE="$HOME/git-sync.log"
+LOG_FILE="$HOME/.log/git-sync.log"
 
 # Log function
 log() {
