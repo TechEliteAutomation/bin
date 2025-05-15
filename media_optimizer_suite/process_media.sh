@@ -21,9 +21,7 @@ set -o pipefail # Pipestatus: if any command in a pipeline fails, the pipeline's
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 RENAMER_SCRIPT_PATH="$SCRIPT_DIR/tools/rename_files.sh"
 PARALLEL_JOBS=${PARALLEL_JOBS:-$(nproc)}
-# Backup directory is now relative to the script's location
-# !!Modify to home directory ~/.bak
-BACKUP_BASE_DIR="$SCRIPT_DIR/backups"
+BACKUP_BASE_DIR="/home/u/.bak" # Backup base directory
 
 # --- Logging Functions ---
 _log_generic() {
@@ -193,10 +191,22 @@ main() {
         exit 1
     }
 
-    _process_archives
+    # 1. Remove duplicates before unzipping (e.g., duplicate archives)
+    log_info "Performing initial duplicate check (before archive processing)..."
+    _remove_duplicates
+
+    _process_archives # Unzip archives
+
+    # 2. Remove duplicates after unzipping (catches extracted duplicates and original files)
+    log_info "Performing duplicate check (after archive processing)..."
+    _remove_duplicates
+
     _rename_files_external || { log_error "Renaming step failed. Aborting subsequent steps."; exit 1; }
     _convert_jpegs_to_png
     _remove_exif_data
+
+    # 3. Remove duplicates after EXIF data removal (catches files that become identical post-EXIF stripping)
+    log_info "Performing duplicate check (after EXIF data removal)..."
     _remove_duplicates
 
     local overall_duration=$((SECONDS - overall_start_time))
