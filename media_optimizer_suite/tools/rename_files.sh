@@ -5,8 +5,7 @@
 #              followed by an extension determined by their MIME type.
 #              Operates on files at maxdepth 1 (current directory only).
 # Version: 1.1
-# Author: AI Assistant
-# Date: $(date +%Y-%m-%d)
+# Author: TechEliteAutomation.com
 
 set -euo pipefail
 
