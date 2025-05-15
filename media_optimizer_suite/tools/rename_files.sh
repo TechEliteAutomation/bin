@@ -26,6 +26,7 @@ _get_extension_from_mime() {
         "audio/aac") echo ".aac" ;;
         "audio/ogg") echo ".ogg" ;;
         "audio/wav") echo ".wav" ;;
+        "audio/x-wav") echo ".wav" ;;
         "image/bmp") echo ".bmp" ;;
         "image/gif") echo ".gif" ;;
         "image/jpeg") echo ".jpg" ;;

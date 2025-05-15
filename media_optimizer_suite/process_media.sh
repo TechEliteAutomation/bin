@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+# Change = line25 & do an rmlint initially to get dupes out of the way; ?ensure files less than 500k get removed
 # Script Name: process_media.sh
 # Description: Orchestrates a media file processing pipeline including:
 #              - Automatic backup of the processing directory
@@ -22,6 +22,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 RENAMER_SCRIPT_PATH="$SCRIPT_DIR/tools/rename_files.sh"
 PARALLEL_JOBS=${PARALLEL_JOBS:-$(nproc)}
 # Backup directory is now relative to the script's location
+# !!Modify to home directory ~/.bak
 BACKUP_BASE_DIR="$SCRIPT_DIR/backups"
 
 # --- Logging Functions ---

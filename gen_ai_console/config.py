@@ -7,7 +7,7 @@ load_dotenv()
 
 # --- API Configuration ---
 API_KEY = os.getenv("GEMINI_API_KEY")
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-pro-exp-03-25")
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-pro-preview-05-06")
 
 # --- TTS Configuration ---
 # 'piper', 'espeak', or 'none'

@@ -1,7 +1,7 @@
 # config.py
 
 # --- Constants ---
-DEFAULT_MODEL = 'gemini-2.5-pro-exp-03-25' # Default model
+DEFAULT_MODEL = 'gemini-2.5-pro-preview-05-06' # Default model
 DEFAULT_MULTI_INPUT_FILE = 'extended_product_input.txt'  # Default input with multiple products
 DEFAULT_OUTPUT_DIR = 'generated_descriptions'  # Default output directory
 PRODUCT_SEPARATOR = '--- PRODUCT SEPARATOR ---'
