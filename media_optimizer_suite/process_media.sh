@@ -1,5 +1,4 @@
 #!/bin/bash
-# Change = line25 & do an rmlint initially to get dupes out of the way; ?ensure files less than 500k get removed
 # Script Name: process_media.sh
 # Description: Orchestrates a media file processing pipeline including:
 #              - Automatic backup of the processing directory
@@ -11,8 +10,7 @@
 #              - Removing EXIF data
 #              - Deduplicating files
 # Version: 1.4
-# Author: TechEliteAutomation.com (modified by user request)
-# Date: $(date +%Y-%m-%d)
+# Author: TechEliteAutomation.com
 
 # --- Script Setup ---
 set -e # Exit immediately if a command exits with a non-zero status.
