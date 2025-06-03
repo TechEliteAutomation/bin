@@ -7,7 +7,7 @@
 #              - Unzipping archives
 #              - Deleting small files post-unzip based on user threshold
 #              - Renaming files (using an external script)
-#              - Converting small JPEGs ( < 500KB) to PNG
+#              - Converting small JPEGs ( < 1000KB/1MiB) to PNG
 #              - Removing EXIF data
 #              - Deduplicating files
 # Version: 1.4
@@ -180,33 +180,6 @@ _rename_files_external() {
     log_info "File renaming process complete."
 }
 
-_convert_jpegs_to_png() {
-    log_step "Converting JPEGs smaller than 500KiB to PNG (parallel)"
-    if ! command -v mogrify >/dev/null 2>&1; then
-        log_warn "ImageMagick 'mogrify' not found. Skipping JPEG to PNG conversion."
-        return
-    fi
-    if ! find . -maxdepth 10 -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -size -500k -print -quit 2>/dev/null | grep -q .; then
-        log_info "No JPEGs smaller than 500KiB found for conversion."
-        return
-    fi
-    log_info "Converting JPEGs smaller than 500KiB in parallel (max $PARALLEL_JOBS jobs)..."
-    find . -maxdepth 10 -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -size -500k -print0 | \
-    xargs -0 -r -P "$PARALLEL_JOBS" -I{} bash -c '
-        file="$1"; base_file=$(basename "$file")
-        _log_conv_ok() { echo "    [CONVERT-JPG-WORKER][$(date "+%H:%M:%S")] OK: $1"; }
-        _log_conv_fail() { echo "    [CONVERT-JPG-WORKER][$(date "+%H:%M:%S")] FAIL: $1" >&2; }
-
-        if mogrify -format png "$file" &>/dev/null; then
-            rm "$file"
-            _log_conv_ok "Converted '\''$base_file'\'' to PNG and removed original."
-        else
-            _log_conv_fail "Could not convert '\''$base_file'\'' to PNG. Original JPEG not removed."
-        fi
-    ' -- {}
-    log_info "JPEG to PNG conversion pass (for files < 500KiB) complete. Check logs above for details."
-}
-
 _remove_exif_data() {
     log_step "Removing EXIF data (recursively)"
     if ! command -v exiftool >/dev/null 2>&1; then
@@ -220,6 +193,33 @@ _remove_exif_data() {
     log_info "Processing files with exiftool..."
     exiftool -all= -overwrite_original -r -q -q .
     log_info "EXIF data removal complete."
+}
+
+_convert_jpegs_to_png() {
+    log_step "Converting JPEGs smaller than 1000KiB/1MiB to PNG (parallel)"
+    if ! command -v mogrify >/dev/null 2>&1; then
+        log_warn "ImageMagick 'mogrify' not found. Skipping JPEG to PNG conversion."
+        return
+    fi
+    if ! find . -maxdepth 10 -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -size -1000k -print -quit 2>/dev/null | grep -q .; then
+        log_info "No JPEGs smaller than 1000KiB/1MiB found for conversion."
+        return
+    fi
+    log_info "Converting JPEGs smaller than 1000KiB/1MiB in parallel (max $PARALLEL_JOBS jobs)..."
+    find . -maxdepth 10 -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) -size -1000k -print0 | \
+    xargs -0 -r -P "$PARALLEL_JOBS" -I{} bash -c '
+        file="$1"; base_file=$(basename "$file")
+        _log_conv_ok() { echo "    [CONVERT-JPG-WORKER][$(date "+%H:%M:%S")] OK: $1"; }
+        _log_conv_fail() { echo "    [CONVERT-JPG-WORKER][$(date "+%H:%M:%S")] FAIL: $1" >&2; }
+
+        if mogrify -format png "$file" &>/dev/null; then
+            rm "$file"
+            _log_conv_ok "Converted '\''$base_file'\'' to PNG and removed original."
+        else
+            _log_conv_fail "Could not convert '\''$base_file'\'' to PNG. Original JPEG not removed."
+        fi
+    ' -- {}
+    log_info "JPEG to PNG conversion pass (for files < 1000KiB/1MiB) complete. Check logs above for details."
 }
 
 _remove_duplicates() {

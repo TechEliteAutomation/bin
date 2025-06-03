@@ -14,18 +14,22 @@ set -euo pipefail
 _get_extension_from_mime() {
     local mime_type="$1"
     case "$mime_type" in
+		"application/json") echo ".json" ;;
         "application/msword") echo ".doc" ;;
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document") echo ".docx" ;;
         "application/pdf") echo ".pdf" ;;
+        "application/vnd.oasis.opendocument.text") echo ".odt" ;;
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") echo ".xlsx" ;;
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document") echo ".docx" ;;
         "application/vnd.rar") echo ".rar" ;; # modern `file` often shows this
         "application/x-rar-compressed") echo ".rar" ;; # older `file`
         "application/zip") echo ".zip" ;;
-        "application/json") echo ".json" ;;
         "audio/mpeg") echo ".mp3" ;;
         "audio/aac") echo ".aac" ;;
         "audio/ogg") echo ".ogg" ;;
         "audio/wav") echo ".wav" ;;
         "audio/x-wav") echo ".wav" ;;
+        "font/ttf") echo ".ttf" ;;
+        "font/otf") echo ".otf" ;;
         "image/bmp") echo ".bmp" ;;
         "image/gif") echo ".gif" ;;
         "image/jpeg") echo ".jpg" ;;
@@ -39,13 +43,11 @@ _get_extension_from_mime() {
         "text/csv") echo ".csv" ;;
         "video/3gpp") echo ".3gp" ;;
         "video/mp4") echo ".mp4" ;;
-        "video/webm") echo ".webm" ;;
         "video/quicktime") echo ".mov" ;;
+        "video/webm") echo ".webm" ;;
         "video/x-m4v") echo ".m4v" ;;
-        "video/x-msvideo") echo ".avi" ;;
         "video/x-matroska") echo ".mkv" ;;
-        "font/ttf") echo ".ttf" ;;
-        "font/otf") echo ".otf" ;;
+        "video/x-msvideo") echo ".avi" ;;
         *) echo "" ;; # Return empty if no match found or unknown
     esac
 }
