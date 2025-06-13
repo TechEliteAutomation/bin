@@ -30,6 +30,7 @@ _get_extension_from_mime() {
         "audio/x-wav") echo ".wav" ;;
         "font/ttf") echo ".ttf" ;;
         "font/otf") echo ".otf" ;;
+		"image/avif") echo ".avif" ;;
         "image/bmp") echo ".bmp" ;;
         "image/gif") echo ".gif" ;;
         "image/jpeg") echo ".jpg" ;;
